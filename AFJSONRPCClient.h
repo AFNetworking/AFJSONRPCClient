@@ -2,7 +2,7 @@
 //  AFJSONRPCClient.h
 //  Japancar
 //
-//  Created by Admin on 27.03.12.
+//  Created by wiistriker@gmail.com on 27.03.12.
 //  Copyright (c) 2012 JustCommunication. All rights reserved.
 //
 
@@ -21,14 +21,23 @@
 
 - (id)initWithURL:(NSURL *)url;
 
-- (void)call:(NSString *)method 
-  parameters:(NSArray *)parameters
-     success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
-     failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
+- (void)invokeMethod:(NSString *)method
+             success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+             failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
 
-- (void)enqueueHTTPRequestOperation:(AFHTTPRequestOperation *)operation;
+- (void)invokeMethod:(NSString *)method
+      withParameters:(NSArray *)parameters
+             success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+             failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
+
+- (void)invokeMethod:(NSString *)method 
+      withParameters:(NSArray *)parameters
+       withRequestId:(NSString *)requestId
+             success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+             failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
 
 - (NSMutableURLRequest *)requestWithMethod:(NSString *)method 
-                                parameters:(NSArray *)parameters;
+                                parameters:(NSArray *)parameters
+                                 requestId:(NSString *)requestId;
 
 @end

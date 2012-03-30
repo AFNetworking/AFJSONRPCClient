@@ -2,13 +2,14 @@
 //  AFJSONRPCClient.m
 //  Japancar
 //
-//  Created by Admin on 27.03.12.
+//  Created by wiistriker@gmail.com on 27.03.12.
 //  Copyright (c) 2012 JustCommunication. All rights reserved.
 //
 
 #import "AFJSONRPCClient.h"
 #import "AFJSONUtilities.h"
 
+NSString * const AFJSONRPCErrorDomain = @"org.json-rpc";
 
 @implementation AFJSONRPCClient
 
@@ -30,15 +31,30 @@
     return self;
 }
 
-- (void)call:(NSString *)method 
-  parameters:(NSArray *)parameters
-     success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
-     failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
+- (void)invokeMethod:(NSString *)method
+             success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+             failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
 {
-    NSURLRequest *request = [self requestWithMethod:method parameters:parameters];
+    [self invokeMethod:method withParameters:[NSArray array] withRequestId:@"1" success:success failure:failure];
+}
+
+- (void)invokeMethod:(NSString *)method
+      withParameters:(NSArray *)parameters
+             success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+             failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
+{
+    [self invokeMethod:method withParameters:parameters withRequestId:@"1" success:success failure:failure];
+}
+
+- (void)invokeMethod:(NSString *)method 
+      withParameters:(NSArray *)parameters
+       withRequestId:(NSString *)requestId
+             success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+             failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
+{
+    NSURLRequest *request = [self requestWithMethod:method parameters:parameters requestId:requestId];
     
     AFJSONRequestOperation *operation = [[[AFJSONRequestOperation alloc] initWithRequest:request] autorelease];
-    //[operation setCompletionBlockWithSuccess:success failure:failure];
     
     [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
@@ -62,7 +78,7 @@
                     }
                     
                     NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:errorMessage, NSLocalizedDescriptionKey, nil];
-                    NSError *error = [NSError errorWithDomain:@"ru.justcommunication" code:errorCode userInfo:userInfo];
+                    NSError *error = [NSError errorWithDomain:AFJSONRPCErrorDomain code:errorCode userInfo:userInfo];
                     failure(operation, error);
                 }
             } else {
@@ -71,7 +87,7 @@
                     NSString *errorMessage = @"Unknown json-rpc response";
                     
                     NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:errorMessage, NSLocalizedDescriptionKey, nil];
-                    NSError *error = [NSError errorWithDomain:@"ru.justcommunication" code:errorCode userInfo:userInfo];
+                    NSError *error = [NSError errorWithDomain:AFJSONRPCErrorDomain code:errorCode userInfo:userInfo];
                     failure(operation, error);
                 }
             }
@@ -82,16 +98,12 @@
         }
     }];
     
-    [self enqueueHTTPRequestOperation:operation];
-}
-
-- (void)enqueueHTTPRequestOperation:(AFHTTPRequestOperation *)operation
-{
     [self.operationQueue addOperation:operation];
 }
 
 - (NSMutableURLRequest *)requestWithMethod:(NSString *)method 
                                 parameters:(NSArray *)parameters
+                                 requestId:(NSString *)requestId
 {	
     NSString *charset = (NSString *)CFStringConvertEncodingToIANACharSetName(CFStringConvertNSStringEncodingToEncoding(NSUTF8StringEncoding));
     
@@ -103,7 +115,7 @@
 						@"2.0", @"jsonrpc",
 						method, @"method",
                         parameters, @"params",
-						@"1", @"id",
+						requestId, @"id",
 						nil];
     
     NSError *error = nil;
