@@ -131,27 +131,12 @@ NSString * const AFJSONRPCErrorDomain = @"org.json-rpc";
     [request setHTTPMethod:@"POST"];
     [request setValue:[NSString stringWithFormat:@"application/json; charset=%@", charset] forHTTPHeaderField:@"Content-Type"];
     
-    NSDictionary *JSONRPCStruct;
-    if ([parameters isKindOfClass:[NSDictionary class]])
-    {
-        NSDictionary *params = (NSDictionary *)parameters;
-        JSONRPCStruct = [NSDictionary dictionaryWithObjectsAndKeys:
-                         @"2.0", @"jsonrpc",
-                         method, @"method",
-                         params, @"params",
-                         requestId, @"id",
-                         nil];
-    }
-    else if ([parameters isKindOfClass:[NSArray class]])
-    {
-        NSArray *params = (NSArray *)parameters;
-        JSONRPCStruct = [NSDictionary dictionaryWithObjectsAndKeys:
-                         @"2.0", @"jsonrpc",
-                         method, @"method",
-                         params, @"params",
-                         requestId, @"id",
-                         nil];
-    }
+    NSDictionary *JSONRPCStruct = [NSDictionary dictionaryWithObjectsAndKeys:
+                     @"2.0", @"jsonrpc",
+                     method, @"method",
+                     parameters, @"params",
+                     requestId, @"id",
+                     nil];
     
     NSError *error = nil;
     NSData *JSONData = AFJSONEncode(JSONRPCStruct, &error);
