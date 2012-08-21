@@ -10,34 +10,23 @@
 #import "AFHTTPRequestOperation.h"
 #import "AFJSONRequestOperation.h"
 
-@interface AFJSONRPCClient : NSObject {
-@private
-    NSURL *_endpointURL;
-    NSOperationQueue *_operationQueue;
-}
+@interface AFJSONRPCClient : NSObject
 
-@property (nonatomic, retain) NSURL *endpointURL;
-@property (nonatomic, retain) NSOperationQueue *operationQueue;
++ (void)setBaseUrl:(NSURL*)url;
 
-- (id)initWithURL:(NSURL *)url;
-
-- (void)invokeMethod:(NSString *)method
++ (void)invokeMethod:(NSString *)method
              success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
              failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
 
-- (void)invokeMethod:(NSString *)method
-      withParameters:(NSArray *)parameters
++ (void)invokeMethod:(NSString *)method
+      withParameters:(NSObject *)parameters
              success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
              failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
 
-- (void)invokeMethod:(NSString *)method 
-      withParameters:(NSArray *)parameters
++ (void)invokeMethod:(NSString *)method
+      withParameters:(NSObject *)parameters
        withRequestId:(NSString *)requestId
              success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
              failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
-
-- (NSMutableURLRequest *)requestWithMethod:(NSString *)method 
-                                parameters:(NSArray *)parameters
-                                 requestId:(NSString *)requestId;
 
 @end
