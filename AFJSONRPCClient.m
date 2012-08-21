@@ -9,6 +9,28 @@
 #import "AFJSONRPCClient.h"
 #import "AFJSONUtilities.h"
 
+@interface AFJSONRPCClient()
+{
+    NSURL *_endpointURL;
+    NSOperationQueue *_operationQueue;
+}
+
+
+@property (nonatomic, retain) NSURL *endpointURL;
+@property (nonatomic, retain) NSOperationQueue *operationQueue;
+
+- (void)invokeMethod:(NSString *)method
+      withParameters:(NSObject *)parameters
+       withRequestId:(NSString *)requestId
+             success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+             failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
+
+- (NSMutableURLRequest *)requestWithMethod:(NSString *)method
+                                parameters:(NSObject *)parameters
+                                 requestId:(NSString *)requestId;
+
+@end
+
 NSString * const AFJSONRPCErrorDomain = @"org.json-rpc";
 
 @implementation AFJSONRPCClient
@@ -16,14 +38,22 @@ NSString * const AFJSONRPCErrorDomain = @"org.json-rpc";
 @synthesize endpointURL = _endpointURL;
 @synthesize operationQueue = _operationQueue;
 
-- (id)initWithURL:(NSURL *)url
++ (id)sharedInstance
+{
+    static dispatch_once_t pred = 0;
+    __strong static id _sharedObject = nil;
+    dispatch_once(&pred, ^{
+        _sharedObject = [[self alloc] init]; // or some other init method
+    });
+    return _sharedObject;
+}
+
+- (id)init
 {
     self = [super init];
     if (!self) {
         return nil;
     }
-    
-    self.endpointURL = url;
     
     self.operationQueue = [[[NSOperationQueue alloc] init] autorelease];
 	[self.operationQueue setMaxConcurrentOperationCount:4];
@@ -31,23 +61,13 @@ NSString * const AFJSONRPCErrorDomain = @"org.json-rpc";
     return self;
 }
 
-- (void)invokeMethod:(NSString *)method
-             success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
-             failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
+- (void)setBaseUrl:(NSURL*)url
 {
-    [self invokeMethod:method withParameters:[NSArray array] withRequestId:@"1" success:success failure:failure];
+    self.endpointURL = url;
 }
 
 - (void)invokeMethod:(NSString *)method
-      withParameters:(NSArray *)parameters
-             success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
-             failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
-{
-    [self invokeMethod:method withParameters:parameters withRequestId:@"1" success:success failure:failure];
-}
-
-- (void)invokeMethod:(NSString *)method 
-      withParameters:(NSArray *)parameters
+      withParameters:(NSObject *)parameters
        withRequestId:(NSString *)requestId
              success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
              failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
@@ -69,7 +89,7 @@ NSString * const AFJSONRPCErrorDomain = @"org.json-rpc";
                 if (failure) {
                     NSInteger errorCode = 0;
                     NSString *errorMessage;
-                
+                    
                     if ([error isKindOfClass:[NSDictionary class]] && [error objectForKey:@"code"] && [error objectForKey:@"message"]) {
                         errorCode = [[error objectForKey:@"code"] intValue];
                         errorMessage = [error objectForKey:@"message"];
@@ -101,10 +121,10 @@ NSString * const AFJSONRPCErrorDomain = @"org.json-rpc";
     [self.operationQueue addOperation:operation];
 }
 
-- (NSMutableURLRequest *)requestWithMethod:(NSString *)method 
-                                parameters:(NSArray *)parameters
+- (NSMutableURLRequest *)requestWithMethod:(NSString *)method
+                                parameters:(NSObject *)parameters
                                  requestId:(NSString *)requestId
-{	
+{
     NSString *charset = (NSString *)CFStringConvertEncodingToIANACharSetName(CFStringConvertNSStringEncodingToEncoding(NSUTF8StringEncoding));
     
 	NSMutableURLRequest *request = [[[NSMutableURLRequest alloc] initWithURL:self.endpointURL] autorelease];
@@ -112,11 +132,11 @@ NSString * const AFJSONRPCErrorDomain = @"org.json-rpc";
     [request setValue:[NSString stringWithFormat:@"application/json; charset=%@", charset] forHTTPHeaderField:@"Content-Type"];
     
     NSDictionary *JSONRPCStruct = [NSDictionary dictionaryWithObjectsAndKeys:
-						@"2.0", @"jsonrpc",
-						method, @"method",
-                        parameters, @"params",
-						requestId, @"id",
-						nil];
+                     @"2.0", @"jsonrpc",
+                     method, @"method",
+                     parameters, @"params",
+                     requestId, @"id",
+                     nil];
     
     NSError *error = nil;
     NSData *JSONData = AFJSONEncode(JSONRPCStruct, &error);
@@ -125,6 +145,38 @@ NSString * const AFJSONRPCErrorDomain = @"org.json-rpc";
     }
     
 	return request;
+}
+
+#pragma mark -
+#pragma mark Methodes statiques
+
++ (void)setBaseUrl:(NSURL*)url
+{
+    [[AFJSONRPCClient sharedInstance] setBaseUrl:url];
+}
+
++ (void)invokeMethod:(NSString *)method
+             success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+             failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
+{
+    [[AFJSONRPCClient sharedInstance] invokeMethod:method withParameters:[NSArray array] withRequestId:@"1" success:success failure:failure];
+}
+
++ (void)invokeMethod:(NSString *)method
+      withParameters:(NSObject *)parameters
+             success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+             failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
+{
+    [[AFJSONRPCClient sharedInstance] invokeMethod:method withParameters:parameters withRequestId:@"1" success:success failure:failure];
+}
+
++ (void)invokeMethod:(NSString *)method
+      withParameters:(NSObject *)parameters
+       withRequestId:(NSString *)requestId
+             success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+             failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
+{
+    [[AFJSONRPCClient sharedInstance] invokeMethod:method withParameters:parameters withRequestId:requestId success:success failure:failure];
 }
 
 - (void)dealloc
