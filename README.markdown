@@ -1,69 +1,48 @@
 Simple JSON-RPC Client based on top of AFNetworking (<a href="https://github.com/AFNetworking/AFNetworking">https://github.com/AFNetworking/AFNetworking</a>)
 
-You have to Subclass AFJSONRPCCLient to use it.
-
 <a href="http://json-rpc.org/">http://json-rpc.org/</a>
 
-A good example can be found in the Example folder
+## Example usage
+``` objective-c
+AFJSONRPCClient *client = [[AFJSONRPCClient alloc] initWithURL:[NSURL URLWithString:@"http://path.to/json-rpc/service/"]];
 
-## Example Usage
+[client invokeWithMethod:@"method.name" success:^(AFHTTPRequestOperation *operation, id responseObject) {
+    //success handling
+} failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+    //error handling
+}];
+
+[client invokeWithMethod:@"method.name" parameters:[NSArray arrayWithObjects:@"1", @"2", nil] success:^(AFHTTPRequestOperation *operation, id responseObject) {
+    //success handling
+} failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+    //error handling
+}];
+
+[client invokeWithMethod:@"method.name" parameters:[NSArray arrayWithObject:@"1"] withRequestId:@"2" success:^(AFHTTPRequestOperation *operation, id responseObject) {
+    //success handling
+} failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+    //error handling
+}];
+```
+
+## Subclassing
+
+You may subclass AFJSONRPCClient for shared class and service-related methods. See Example folder.
 
 ``` objective-c
-// You can use the Example way :
-[MyJSONRPCClient invokeMethod:@"method.name"
-                          success:^(AFHTTPRequestOperation *operation, id responseObject) {
-                              NSLog(@"Success !");
-                          }
-                          failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-                              NSLog(@"Fail...");
-                          }];
+MyJSONRPCClient *client = [MyJSONRPCClient sharedInstance];
 
-// Or you can just use the sharedInstance
-[MyJSONRPCClient sharedInstance] invokeMethod:@"method.name"
-                          success:^(AFHTTPRequestOperation *operation, id responseObject) {
-                              NSLog(@"Success !");
-                          }
-                          failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-                              NSLog(@"Fail...");
-                          }];
+[client invokeWithMethod:@"method.name" success:^(AFHTTPRequestOperation *operation, id responseObject) {
+    //success handling
+} failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+    //error handling
+}];
 
-// Call without parameters
-[MyJSONRPCClient invokeMethod:@"method.name"
-                          success:^(AFHTTPRequestOperation *operation, id responseObject) {
-                              NSLog(@"Success !");
-                          }
-                          failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-                              NSLog(@"Fail...");
-                          }];
-
-// Call with parameters
-[MyJSONRPCClient invokeMethod:@"method.name"
-                   withParameters:[NSArray arrayWithObjects:@"1", @"2", nil]
-                          success:^(AFHTTPRequestOperation *operation, id responseObject) {
-                              NSLog(@"Success !");
-                          }
-                          failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-                              NSLog(@"Fail...");
-                          }];
-
-// Call with named parameters
-[MyJSONRPCClient invokeMethod:@"method.name"
-                   withParameters:[NSDictionary dictionaryWithObject:@"object" forKey:@"param.name"]
-                          success:^(AFHTTPRequestOperation *operation, id responseObject) {
-                              NSLog(@"Success !");
-                          }
-                          failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-                              NSLog(@"Fail...");
-                          }];
-
-// Call with request ID
-[MyJSONRPCClient invokeMethod:@"method.name"
-                   withParameters:[NSDictionary dictionaryWithObject:@"object" forKey:@"param.name"]
-                    withRequestId:@"2"
-                          success:^(AFHTTPRequestOperation *operation, id responseObject) {
-                              NSLog(@"Success !");
-                          }
-                          failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-                              NSLog(@"Fail...");
-                          }];
+//call wrapped method
+[client summ:[NSNumber numberWithInt:1] withNumber:[NSNumber numberWithInt:2]
+  success:^(AFHTTPRequestOperation *operation, id responseObject) {
+    //success handling
+} failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+    //error handling
+}];
 ```

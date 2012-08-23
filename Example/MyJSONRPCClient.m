@@ -23,31 +23,15 @@ static NSString * const kMyClientURL = @"http://Your.RPC-Server.URL";
     return _sharedInstance;
 }
 
-#pragma mark -
-#pragma mark Static functions
-
-+ (void)invokeMethod:(NSString *)method
-             success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
-             failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
+- (void)summ:(NSNumber *)number1
+  withNumber:(NSNumber *)number2
+     success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+     failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
 {
-    [[MyJSONRPCClient sharedInstance] invokeMethod:method withParameters:[NSArray array] withRequestId:@"1" success:success failure:failure];
-}
-
-+ (void)invokeMethod:(NSString *)method
-      withParameters:(NSObject *)parameters
-             success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
-             failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
-{
-    [[MyJSONRPCClient sharedInstance] invokeMethod:method withParameters:parameters withRequestId:@"1" success:success failure:failure];
-}
-
-+ (void)invokeMethod:(NSString *)method
-      withParameters:(NSObject *)parameters
-       withRequestId:(NSString *)requestId
-             success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
-             failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
-{
-    [[MyJSONRPCClient sharedInstance] invokeMethod:method withParameters:parameters withRequestId:requestId success:success failure:failure];
+    [self invokeMethod:@"math.sum"
+        withParameters:[NSArray arrayWithObjects:number1, number2, nil]
+               success:success
+               failure:failure];
 }
 
 @end

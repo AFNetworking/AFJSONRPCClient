@@ -12,19 +12,9 @@
 
 + (MyJSONRPCClient *)sharedInstance;
 
-+ (void)invokeMethod:(NSString *)method
-             success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
-             failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
-
-+ (void)invokeMethod:(NSString *)method
-      withParameters:(NSObject *)parameters
-             success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
-             failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
-
-+ (void)invokeMethod:(NSString *)method
-      withParameters:(NSObject *)parameters
-       withRequestId:(NSString *)requestId
-             success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
-             failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
+- (void)summ:(NSNumber *)number1
+  withNumber:(NSNumber *)number2
+     success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+     failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
 
 @end
