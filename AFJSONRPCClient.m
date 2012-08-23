@@ -16,8 +16,8 @@
 }
 
 
-@property (nonatomic, retain) NSURL *endpointURL;
-@property (nonatomic, retain) NSOperationQueue *operationQueue;
+@property (nonatomic, strong) NSURL *endpointURL;
+@property (nonatomic, strong) NSOperationQueue *operationQueue;
 
 - (void)invokeMethod:(NSString *)method
       withParameters:(NSObject *)parameters
@@ -38,24 +38,20 @@ NSString * const AFJSONRPCErrorDomain = @"org.json-rpc";
 @synthesize endpointURL = _endpointURL;
 @synthesize operationQueue = _operationQueue;
 
-+ (id)sharedInstance
++ (AFJSONRPCClient*)clientWithBaseUrl:(NSURL*)url
 {
-    static dispatch_once_t pred = 0;
-    __strong static id _sharedObject = nil;
-    dispatch_once(&pred, ^{
-        _sharedObject = [[self alloc] init]; // or some other init method
-    });
-    return _sharedObject;
+    return [[self alloc] initWithBaseUrl:url];
 }
 
-- (id)init
+- (id)initWithBaseUrl:(NSURL*)url
 {
     self = [super init];
     if (!self) {
         return nil;
     }
     
-    self.operationQueue = [[[NSOperationQueue alloc] init] autorelease];
+    self.endpointURL = url;
+    self.operationQueue = [[NSOperationQueue alloc] init];
 	[self.operationQueue setMaxConcurrentOperationCount:4];
     
     return self;
@@ -74,7 +70,7 @@ NSString * const AFJSONRPCErrorDomain = @"org.json-rpc";
 {
     NSURLRequest *request = [self requestWithMethod:method parameters:parameters requestId:requestId];
     
-    AFJSONRequestOperation *operation = [[[AFJSONRequestOperation alloc] initWithRequest:request] autorelease];
+    AFJSONRequestOperation *operation = [[AFJSONRequestOperation alloc] initWithRequest:request];
     
     [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
@@ -125,9 +121,9 @@ NSString * const AFJSONRPCErrorDomain = @"org.json-rpc";
                                 parameters:(NSObject *)parameters
                                  requestId:(NSString *)requestId
 {
-    NSString *charset = (NSString *)CFStringConvertEncodingToIANACharSetName(CFStringConvertNSStringEncodingToEncoding(NSUTF8StringEncoding));
+    NSString *charset = (__bridge NSString *)CFStringConvertEncodingToIANACharSetName(CFStringConvertNSStringEncodingToEncoding(NSUTF8StringEncoding));
     
-	NSMutableURLRequest *request = [[[NSMutableURLRequest alloc] initWithURL:self.endpointURL] autorelease];
+	NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:self.endpointURL];
     [request setHTTPMethod:@"POST"];
     [request setValue:[NSString stringWithFormat:@"application/json; charset=%@", charset] forHTTPHeaderField:@"Content-Type"];
     
@@ -145,45 +141,6 @@ NSString * const AFJSONRPCErrorDomain = @"org.json-rpc";
     }
     
 	return request;
-}
-
-#pragma mark -
-#pragma mark Methodes statiques
-
-+ (void)setBaseUrl:(NSURL*)url
-{
-    [[AFJSONRPCClient sharedInstance] setBaseUrl:url];
-}
-
-+ (void)invokeMethod:(NSString *)method
-             success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
-             failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
-{
-    [[AFJSONRPCClient sharedInstance] invokeMethod:method withParameters:[NSArray array] withRequestId:@"1" success:success failure:failure];
-}
-
-+ (void)invokeMethod:(NSString *)method
-      withParameters:(NSObject *)parameters
-             success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
-             failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
-{
-    [[AFJSONRPCClient sharedInstance] invokeMethod:method withParameters:parameters withRequestId:@"1" success:success failure:failure];
-}
-
-+ (void)invokeMethod:(NSString *)method
-      withParameters:(NSObject *)parameters
-       withRequestId:(NSString *)requestId
-             success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
-             failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
-{
-    [[AFJSONRPCClient sharedInstance] invokeMethod:method withParameters:parameters withRequestId:requestId success:success failure:failure];
-}
-
-- (void)dealloc
-{
-    [_endpointURL release];
-    [_operationQueue release];
-    [super dealloc];
 }
 
 @end
