@@ -8,7 +8,6 @@
 
 #import <Foundation/Foundation.h>
 #import "AFHTTPRequestOperation.h"
-//#import "AFJSONRequestOperation.h"
 
 @interface AFJSONRPCClient : NSObject {
 @private
@@ -18,6 +17,8 @@
 
 @property (nonatomic, retain) NSURL *endpointURL;
 @property (nonatomic, retain) NSOperationQueue *operationQueue;
+
+- (id)initWithURL:(NSURL *)url;
 
 - (void)invokeMethod:(NSString *)method
              success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
@@ -35,7 +36,7 @@
              failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
 
 - (NSMutableURLRequest *)requestWithMethod:(NSString *)method 
-                                parameters:(NSArray *)parameters
+                                parameters:(NSObject *)parameters
                                  requestId:(NSString *)requestId;
 
 @end

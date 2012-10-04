@@ -7,6 +7,7 @@
 //
 
 #import "AFJSONRPCClient.h"
+#import "AFJSONRequestOperation.h"
 #import "AFJSONUtilities.h"
 
 NSString * const AFJSONRPCErrorDomain = @"org.json-rpc";
@@ -31,10 +32,12 @@ NSString * const AFJSONRPCErrorDomain = @"org.json-rpc";
     return self;
 }
 
+/*
 - (void)setEndpointURL:(NSURL*)url
 {
-    self.endpointURL = url;
+    _endpointURL = url;
 }
+*/
 
 - (void)invokeMethod:(NSString *)method
              success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
@@ -63,7 +66,7 @@ NSString * const AFJSONRPCErrorDomain = @"org.json-rpc";
     
     [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
         NSInteger errorCode = 0;
-        NSString *errorMessage;
+        NSString *errorMessage = nil;
     
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             id result = [responseObject objectForKey:@"result"];
@@ -106,9 +109,9 @@ NSString * const AFJSONRPCErrorDomain = @"org.json-rpc";
                                 parameters:(NSObject *)parameters
                                  requestId:(NSString *)requestId
 {
-    NSString *charset = (__bridge NSString *)CFStringConvertEncodingToIANACharSetName(CFStringConvertNSStringEncodingToEncoding(NSUTF8StringEncoding));
+    NSString *charset = (NSString *)CFStringConvertEncodingToIANACharSetName(CFStringConvertNSStringEncodingToEncoding(NSUTF8StringEncoding));
     
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithUrl:self.endpointURL];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:self.endpointURL];
     [request setHTTPMethod:@"POST"];
     [request setValue:[NSString stringWithFormat:@"application/json; charset=%@", charset] forHTTPHeaderField:@"Content-Type"];
     
