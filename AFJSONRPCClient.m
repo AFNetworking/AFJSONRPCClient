@@ -62,6 +62,7 @@ NSString * const AFJSONRPCErrorDomain = @"org.json-rpc";
     NSURLRequest *request = [self requestWithMethod:method parameters:parameters requestId:requestId];
     
     AFJSONRequestOperation *operation = [[AFJSONRequestOperation alloc] initWithRequest:request];
+    [AFJSONRequestOperation addAcceptableContentTypes:[NSSet setWithObjects:@"application/json-rpc", @"application/jsonrequest", nil]];
     
     [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
         NSInteger errorCode = 0;
