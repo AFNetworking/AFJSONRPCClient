@@ -17,7 +17,7 @@ static NSString * const kMyClientURL = @"http://Your.RPC-Server.URL";
     static MyJSONRPCClient *_sharedInstance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        _sharedInstance = [[MyJSONRPCClient alloc] initWithBaseUrl:[NSURL URLWithString:kMyClientURL]];
+        _sharedInstance = [[MyJSONRPCClient alloc] initWithUrl:[NSURL URLWithString:kMyClientURL]];
     });
     
     return _sharedInstance;
