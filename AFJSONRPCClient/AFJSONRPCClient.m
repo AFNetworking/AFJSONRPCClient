@@ -67,7 +67,7 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
 }
 
 - (void)invokeMethod:(NSString *)method
-      withParameters:(NSArray *)parameters
+      withParameters:(id)parameters
              success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
              failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
 {
@@ -75,7 +75,7 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
 }
 
 - (void)invokeMethod:(NSString *)method
-      withParameters:(NSArray *)parameters
+      withParameters:(id)parameters
            requestId:(id)requestId
              success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
              failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
@@ -86,7 +86,7 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
 }
 
 - (NSMutableURLRequest *)requestWithMethod:(NSString *)method
-                                parameters:(NSArray *)parameters
+                                parameters:(id)parameters
                                  requestId:(id)requestId
 {
     NSParameterAssert(method);
@@ -94,6 +94,8 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
     if (!parameters) {
         parameters = [NSArray array];
     }
+
+    NSAssert([parameters isKindOfClass:[NSDictionary class]] || [parameters isKindOfClass:[NSArray class]]);
 
     if (!requestId) {
         requestId = [NSNumber numberWithInteger:1];
