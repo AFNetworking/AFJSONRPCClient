@@ -10,8 +10,8 @@
 AFJSONRPCClient *client = [AFJSONRPCClient clientWithEndpointURL:[NSURL URLWithString:@"http://path.to/json-rpc/service/"]];
 
 // Invocation
-[client invokeWithMethod:@"method.name" 
-    success:^(AFHTTPRequestOperation *operation, id responseObject) 
+[client invokeWithMethod:@"method.name"
+    success:^(AFHTTPRequestOperation *operation, id responseObject)
 {
     // ...
 }   failure:^(AFHTTPRequestOperation *operation, NSError *error) {
@@ -19,8 +19,8 @@ AFJSONRPCClient *client = [AFJSONRPCClient clientWithEndpointURL:[NSURL URLWithS
 }];
 
 // Invocation with Parameters
-[client invokeWithMethod:@"method.name" 
-              parameters:@[@"foo", @"bar", @"baz"] 
+[client invokeWithMethod:@"method.name"
+              parameters:@{@"foo" : @"bar", @"baz" : @(13)}
     success:^(AFHTTPRequestOperation *operation, id responseObject) {
     // ...
 }   failure:^(AFHTTPRequestOperation *operation, NSError *error) {
@@ -28,9 +28,9 @@ AFJSONRPCClient *client = [AFJSONRPCClient clientWithEndpointURL:[NSURL URLWithS
 }];
 
 // Invocation with Parameters and Request ID
-[client invokeWithMethod:@"method.name" 
-              parameters:@[@(YES), @(42)] 
-               requestId:@(2) 
+[client invokeWithMethod:@"method.name"
+              parameters:@[@(YES), @(42)]
+               requestId:@(2)
     success:^(AFHTTPRequestOperation *operation, id responseObject) {
     // ...
 }   failure:^(AFHTTPRequestOperation *operation, NSError *error) {
@@ -38,9 +38,30 @@ AFJSONRPCClient *client = [AFJSONRPCClient clientWithEndpointURL:[NSURL URLWithS
 }];
 ```
 
+## Using Protocol & NSProxy
+
+Combine your JSON-RPC client with an Objective-C protocol for fun and profit!
+
+``` objective-c
+@protocol ArithemeticProtocol
+- (void)sum:(NSArray *)numbers
+    success:(void (^)(NSNumber *sum))success;
+    failure:(void (^)(NSError *error))failure;
+@end
+
+AFJSONRPCClient *client = [AFJSONRPCClient clientWithEndpointURL:[NSURL URLWithString:@"http://path.to/json-rpc/service/"]];
+
+[[client proxyForProtocol:@protocol(ArithemeticProtocol)] sum:@[@(1), @(2)]
+    success:^(NSNumber *sum) {
+    // ...
+}   failure:^(NSError *error) {
+    // ...
+}];
+```
+
 ## Subclassing
 
-You may subclass `AFJSONRPCClient` for shared class and service-related methods:
+You can also subclass `AFJSONRPCClient` for shared class and service-related methods:
 
 ``` objective-c
 MyJSONRPCClient *client = [MyJSONRPCClient sharedClient];
@@ -55,9 +76,9 @@ MyJSONRPCClient *client = [MyJSONRPCClient sharedClient];
 
 ## Installation
 
-[CocoaPods](http://cocoapods.org) is the recommended way to add AFIncrementalStore to your project.
+[CocoaPods](http://cocoapods.org) is the recommended way to add AFJSONRPCClient to your project.
 
-Here's an example podfile that installs AFIncrementalStore and its dependency, AFNetworking. 
+Here's an example podfile that installs AFJSONRPCClient and its dependency, AFNetworking.
 
 ### Podfile
 

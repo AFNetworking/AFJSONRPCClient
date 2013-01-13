@@ -24,7 +24,16 @@
 #import "AFJSONRPCClient.h"
 #import "AFJSONRequestOperation.h"
 
+#import <objc/runtime.h>
+
 NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
+
+@interface AFJSONRPCProxy : NSProxy
+- (id)initWithClient:(AFJSONRPCClient *)client
+            protocol:(Protocol *)protocol;
+@end
+
+#pragma mark -
 
 @interface AFJSONRPCClient ()
 @property (readwrite, nonatomic, strong) NSURL *endpointURL;
@@ -67,7 +76,7 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
 }
 
 - (void)invokeMethod:(NSString *)method
-      withParameters:(NSArray *)parameters
+      withParameters:(id)parameters
              success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
              failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
 {
@@ -75,7 +84,7 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
 }
 
 - (void)invokeMethod:(NSString *)method
-      withParameters:(NSArray *)parameters
+      withParameters:(id)parameters
            requestId:(id)requestId
              success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
              failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
@@ -86,7 +95,7 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
 }
 
 - (NSMutableURLRequest *)requestWithMethod:(NSString *)method
-                                parameters:(NSArray *)parameters
+                                parameters:(id)parameters
                                  requestId:(id)requestId
 {
     NSParameterAssert(method);
@@ -94,6 +103,8 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
     if (!parameters) {
         parameters = [NSArray array];
     }
+
+    NSAssert([parameters isKindOfClass:[NSDictionary class]] || [parameters isKindOfClass:[NSArray class]], @"Expect NSArray or NSDictionary in JSONRPC parameters");
 
     if (!requestId) {
         requestId = [NSNumber numberWithInteger:1];
@@ -150,6 +161,77 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         if (failure) {
             failure(operation, error);
+        }
+    }];
+}
+
+- (id)proxyWithProtocol:(Protocol *)protocol {
+    return [[AFJSONRPCProxy alloc] initWithClient:self protocol:protocol];
+}
+
+@end
+
+#pragma mark -
+
+typedef void (^AFJSONRPCProxySuccessBlock)(id responseObject);
+typedef void (^AFJSONRPCProxyFailureBlock)(NSError *error);
+
+@interface AFJSONRPCProxy ()
+@property (readwrite, nonatomic, strong) AFJSONRPCClient *client;
+@property (readwrite, nonatomic, strong) Protocol *protocol;
+@end
+
+@implementation AFJSONRPCProxy
+@synthesize client = _client;
+@synthesize protocol = _protocol;
+
+- (id)initWithClient:(AFJSONRPCClient*)client
+            protocol:(Protocol *)protocol
+{
+    self.client = client;
+    self.protocol = protocol;
+
+    return self;
+}
+
+- (BOOL)respondsToSelector:(SEL)selector {
+    struct objc_method_description description = protocol_getMethodDescription(self.protocol, selector, YES, YES);
+
+    return description.name != NULL;
+}
+
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)selector {
+    // 0: v->RET || 1: @->self || 2: :->SEL || 3: @->arg#0 (NSArray) || 4,5: ^v->arg#1,2 (block)
+    NSMethodSignature *signature = [NSMethodSignature signatureWithObjCTypes:"v@:@^v^v"];
+
+    return signature;
+}
+
+- (void)forwardInvocation:(NSInvocation *)invocation {
+    NSParameterAssert(invocation.methodSignature.numberOfArguments == 5);
+
+    NSString *RPCMethod = [[NSStringFromSelector([invocation selector]) componentsSeparatedByString:@":"] objectAtIndex:0];
+
+    __unsafe_unretained id arguments;
+    __unsafe_unretained AFJSONRPCProxySuccessBlock unsafeSuccess;
+    __unsafe_unretained AFJSONRPCProxyFailureBlock unsafeFailure;
+
+    [invocation getArgument:&arguments atIndex:2];
+    [invocation getArgument:&unsafeSuccess atIndex:3];
+    [invocation getArgument:&unsafeFailure atIndex:4];
+    
+    [invocation invokeWithTarget:nil];
+
+    __strong AFJSONRPCProxySuccessBlock strongSuccess = [unsafeSuccess copy];
+    __strong AFJSONRPCProxyFailureBlock strongFailure = [unsafeFailure copy];
+
+    [self.client invokeMethod:RPCMethod withParameters:arguments success:^(AFHTTPRequestOperation *operation, id responseObject) {
+        if (strongSuccess) {
+            strongSuccess(responseObject);
+        }
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        if (strongFailure) {
+            strongFailure(error);
         }
     }];
 }
