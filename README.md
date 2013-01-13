@@ -20,7 +20,7 @@ AFJSONRPCClient *client = [AFJSONRPCClient clientWithEndpointURL:[NSURL URLWithS
 
 // Invocation with Parameters
 [client invokeWithMethod:@"method.name" 
-              parameters:@[@"foo", @"bar", @"baz"] 
+              parameters:@{@"foo" : @"bar", @"baz" : @(13)}
     success:^(AFHTTPRequestOperation *operation, id responseObject) {
     // ...
 }   failure:^(AFHTTPRequestOperation *operation, NSError *error) {
@@ -55,9 +55,9 @@ MyJSONRPCClient *client = [MyJSONRPCClient sharedClient];
 
 ## Installation
 
-[CocoaPods](http://cocoapods.org) is the recommended way to add AFIncrementalStore to your project.
+[CocoaPods](http://cocoapods.org) is the recommended way to add AFJSONRPCClient to your project.
 
-Here's an example podfile that installs AFIncrementalStore and its dependency, AFNetworking. 
+Here's an example podfile that installs AFJSONRPCClient and its dependency, AFNetworking. 
 
 ### Podfile
 
