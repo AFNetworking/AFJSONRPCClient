@@ -55,9 +55,9 @@ MyJSONRPCClient *client = [MyJSONRPCClient sharedClient];
 
 ## Installation
 
-[CocoaPods](http://cocoapods.org) is the recommended way to add AFIncrementalStore to your project.
+[CocoaPods](http://cocoapods.org) is the recommended way to add AFJSONRPCClient to your project.
 
-Here's an example podfile that installs AFIncrementalStore and its dependency, AFNetworking. 
+Here's an example podfile that installs AFJSONRPCClient and its dependency, AFNetworking. 
 
 ### Podfile
 
