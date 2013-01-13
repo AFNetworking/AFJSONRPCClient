@@ -63,7 +63,7 @@
  */
 - (void)invokeMethod:(NSString *)method
       withParameters:(NSArray *)parameters
-       withRequestId:(id)requestId
+           requestId:(id)requestId
              success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
              failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
 

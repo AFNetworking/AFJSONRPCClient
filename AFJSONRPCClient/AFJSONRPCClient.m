@@ -42,7 +42,7 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
 }
 
 - (id)initWithEndpointURL:(NSURL *)URL {
-    NSParameterAssert(url);
+    NSParameterAssert(URL);
 
     self = [super initWithBaseURL:URL];
     if (!self) {
@@ -63,7 +63,7 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
              success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
              failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
 {
-    [self invokeMethod:method withParameters:[NSArray array] withRequestId:@"1" success:success failure:failure];
+    [self invokeMethod:method withParameters:[NSArray array] success:success failure:failure];
 }
 
 - (void)invokeMethod:(NSString *)method
@@ -71,12 +71,12 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
              success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
              failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
 {
-    [self invokeMethod:method withParameters:parameters withRequestId:@"1" success:success failure:failure];
+    [self invokeMethod:method withParameters:parameters requestId:[NSNumber numberWithInteger:1] success:success failure:failure];
 }
 
 - (void)invokeMethod:(NSString *)method
       withParameters:(NSArray *)parameters
-       withRequestId:(id)requestId
+           requestId:(id)requestId
              success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
              failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
 {
