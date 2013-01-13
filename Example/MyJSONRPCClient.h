@@ -1,20 +1,34 @@
+// MyJSONRPCClient.h
 //
-//  MyJSONRPCClient.h
-//  Localeezy
+// Created by Clément Dal Palu
+// Copyright (c) 2013 Localeezy
 //
-//  Created by Clément Dal Palu on 22/08/12.
-//  Copyright (c) 2012 Localeezy. All rights reserved.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 //
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 
 #import "AFJSONRPCClient.h"
 
 @interface MyJSONRPCClient : AFJSONRPCClient
 
-+ (MyJSONRPCClient *)sharedInstance;
++ (instancetype)sharedClient;
 
-- (void)summ:(NSNumber *)number1
-  withNumber:(NSNumber *)number2
-     success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
-     failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
+- (void)sum:(NSArray *)numbers
+    success:(void (^)(NSNumber *sum))success
+    failure:(void (^)(NSError *error))failure;
 
 @end
