@@ -54,7 +54,7 @@
  
  */
 - (void)invokeMethod:(NSString *)method
-      withParameters:(NSArray *)parameters
+      withParameters:(id)parameters
              success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
              failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
 
@@ -62,7 +62,7 @@
  
  */
 - (void)invokeMethod:(NSString *)method
-      withParameters:(NSArray *)parameters
+      withParameters:(id)parameters
            requestId:(id)requestId
              success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
              failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
@@ -71,7 +71,7 @@
  
  */
 - (NSMutableURLRequest *)requestWithMethod:(NSString *)method
-                                parameters:(NSArray *)parameters
+                                parameters:(id)parameters
                                  requestId:(id)requestId;
 
 
