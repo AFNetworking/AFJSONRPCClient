@@ -32,7 +32,7 @@ static NSString * const kMyClientURL = @"http://Your.RPC-Server.URL";
     static MyJSONRPCClient *_sharedInstance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        _sharedInstance = [[MyJSONRPCClient alloc] initWithUrl:[NSURL URLWithString:kMyClientURL]];
+        _sharedInstance = [[MyJSONRPCClient alloc] initWithEndpointURL:[NSURL URLWithString:kMyClientURL]];
     });
     
     return _sharedInstance;
@@ -42,11 +42,11 @@ static NSString * const kMyClientURL = @"http://Your.RPC-Server.URL";
     success:(void (^)(NSNumber *sum))success
     failure:(void (^)(NSError *error))failure
 {
-    [self invokeMethod:@"math.sum" withParameters:numbers success:^(NSNumber *sum) {
+    [self invokeMethod:@"math.sum" withParameters:numbers success:^(AFHTTPRequestOperation *operation, id responseObject) {
         if (success) {
-            success(sum);
+            success(responseObject);
         }
-    } failure:^(NSError *error) {
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         if (failure) {
             failure(error);
         }
