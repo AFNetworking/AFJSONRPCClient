@@ -6,13 +6,15 @@
 
 #import <Foundation/Foundation.h>
 #import "AFJSONRPCClient.h"
+
+typedef void (^afproxy_success_callback_t)(id responseObject);
+typedef void (^afproxy_failure_callback_t)(NSError *error);
+
 @interface AFJSONRPCProxy : NSProxy
 
-+ (instancetype)proxyWithEndpointURL:(NSURL *)URL protocol:(Protocol*) protocol;
++ (id)proxyWithEndpointURL:(NSURL *)URL protocol:(Protocol*) protocol;
 - (id)initWithEndpointURL:(NSURL *)URL protocol:(Protocol*) protocol;
 
 @property AFJSONRPCClient *client;
-
-@property (nonatomic, readonly) NSMutableArray *interceptedMessageStrings;
 
 @end

@@ -6,6 +6,7 @@
 
 #import "AFJSONRPCProxy.h"
 #import <objc/runtime.h>
+
 @interface NSMethodSignature (objctypes)
 +(NSMethodSignature*)signatureWithObjCTypes:(const char*)types;
 @end
@@ -23,7 +24,6 @@
     if (self)
     {
         _client = [AFJSONRPCClient clientWithEndpointURL:URL];
-        _interceptedMessageStrings = [NSMutableArray array];
         iProtocol = protocol;
     }
     return self;
@@ -45,6 +45,7 @@
 //    struct objc_method_description omd = protocol_getMethodDescription(iProtocol, sel, YES, YES);
 //    NSLog(@"%@ => objc_method_description->name: %@", NSStringFromSelector(sel), NSStringFromSelector(omd.name));
 //    NSLog(@"selector -> %@", NSStringFromSelector(sel));
+    
     // 0:v->RET || 1:@->self || 2::->SEL || 3:@->arg#0 (NSArray) || 4/5:^v->arg#1/2 (block)
     NSMethodSignature *sig = [NSMethodSignature signatureWithObjCTypes:"v@:@^v^v"];
     return sig;
@@ -56,20 +57,20 @@
     NSArray *messSplit = [message componentsSeparatedByString:@":"];
     NSString *jsonMethod = [messSplit objectAtIndex:0];
 
-    NSLog(@"message -> %s %@" ,sel_getName(invocation.selector), jsonMethod );
-    NSArray *argArray;
-    NSMethodSignature *signature = invocation.methodSignature;
+    //NSLog(@"message -> %s %@" ,sel_getName(invocation.selector), jsonMethod );
+    id arguments;
+    __block afproxy_success_callback_t success_callback;
+    __block afproxy_failure_callback_t failure_callback;
     NSAssert(invocation.methodSignature.numberOfArguments==5, @"numberOfArguments != 5");
-    [invocation getArgument:&argArray atIndex:2]; // 0 und 1 sind SELF / SEL
-    NSLog(@"array? %@",argArray);
-//    void *pointer;
-//    for (int index=0; index < signature.numberOfArguments; index++) {
-//        const char *typeEncoding = [signature getArgumentTypeAtIndex:index];
-//        [invocation getArgument:&pointer atIndex:index];
-//        NSLog(@"#%i %s -> 0x%x", index, typeEncoding, pointer);
-//    }
-    [self.interceptedMessageStrings addObject:message];
-    [invocation invokeWithTarget:nil];
+    [invocation getArgument:&arguments atIndex:2]; // 0 und 1 sind SELF / SEL
+    [invocation getArgument:&success_callback atIndex:3];
+    [invocation getArgument:&failure_callback atIndex:4];
+
+    [_client invokeMethod:jsonMethod withParameters:arguments success:^(AFHTTPRequestOperation *operation, id responseObject) {
+        success_callback(responseObject);
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        failure_callback(error);
+    }];
 }
 
 @end
