@@ -7,11 +7,8 @@
 #import "AFJSONRPCProxy.h"
 #import <objc/runtime.h>
 
-@interface NSMethodSignature (objctypes)
-+(NSMethodSignature*)signatureWithObjCTypes:(const char*)types;
-@end
 @interface  AFJSONRPCProxy () {
-    Protocol *iProtocol;
+    Protocol *implementedProtocol;
 }
 
 @end 
@@ -24,7 +21,7 @@
     if (self)
     {
         _client = [AFJSONRPCClient clientWithEndpointURL:URL];
-        iProtocol = protocol;
+        implementedProtocol = protocol;
     }
     return self;
 }
@@ -36,13 +33,13 @@
 
 - (BOOL)respondsToSelector:(SEL)aSelector
 {
-    struct objc_method_description omd = protocol_getMethodDescription(iProtocol, aSelector, YES, YES);
+    struct objc_method_description omd = protocol_getMethodDescription(implementedProtocol, aSelector, YES, YES);
 //    NSLog(@"%@ => objc_method_description->name: %@", NSStringFromSelector(aSelector), NSStringFromSelector(omd.name));
     return omd.name!=NULL;
 }
 
 - (NSMethodSignature *)methodSignatureForSelector:(SEL)sel {
-//    struct objc_method_description omd = protocol_getMethodDescription(iProtocol, sel, YES, YES);
+//    struct objc_method_description omd = protocol_getMethodDescription(implementedProtocol, sel, YES, YES);
 //    NSLog(@"%@ => objc_method_description->name: %@", NSStringFromSelector(sel), NSStringFromSelector(omd.name));
 //    NSLog(@"selector -> %@", NSStringFromSelector(sel));
     
