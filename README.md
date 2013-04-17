@@ -53,6 +53,27 @@ MyJSONRPCClient *client = [MyJSONRPCClient sharedClient];
 }];
 ```
 
+## Using Protocol and NSProxy (no need for an own subclass)
+
+``` objective-c
+
+@protocol MyJSONRPCProtocol
+- (void)sum:(NSArray *)numbers
+            success:(afproxy_success_callback_t) success
+            failure:(afproxy_failure_callback_t) failure;
+@end
+
+id<MyJSONRPCProtocol> proxy = [AFJSONRPCProxy proxyWithEndpointURL:[NSURL URLWithString:@"http://path.to/json-rpc/service/"] 
+											  protocol:@protocol(MyJSONRPCProtocol)];
+
+[proxy sum:@[@(1), @(2)]
+    success:^(NSNumber *sum) {
+    // ...
+}   failure:^(NSError *error) {
+    // ...
+}];
+```
+
 ## Installation
 
 [CocoaPods](http://cocoapods.org) is the recommended way to add AFJSONRPCClient to your project.
