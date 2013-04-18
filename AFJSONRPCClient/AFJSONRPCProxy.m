@@ -55,19 +55,24 @@
     NSString *jsonMethod = [messSplit objectAtIndex:0];
 
     //NSLog(@"message -> %s %@" ,sel_getName(invocation.selector), jsonMethod );
-    id arguments;
-    __block afproxy_success_callback_t success_callback;
-    __block afproxy_failure_callback_t failure_callback;
+    __unsafe_unretained id arguments;
+    __unsafe_unretained  afproxy_success_callback_t success_callback;
+    __unsafe_unretained  afproxy_failure_callback_t failure_callback;
+
     NSAssert(invocation.methodSignature.numberOfArguments==5, @"numberOfArguments != 5");
     [invocation getArgument:&arguments atIndex:2]; // 0 und 1 sind SELF / SEL
     [invocation getArgument:&success_callback atIndex:3];
     [invocation getArgument:&failure_callback atIndex:4];
-
+    
+    __block afproxy_success_callback_t success_callback_copy = [success_callback copy];
+    __block afproxy_failure_callback_t failure_callback_copy = [failure_callback copy];
+    
     [_client invokeMethod:jsonMethod withParameters:arguments success:^(AFHTTPRequestOperation *operation, id responseObject) {
-        success_callback(responseObject);
+        success_callback_copy(responseObject);
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-        failure_callback(error);
+        failure_callback_copy(error);
     }];
+    [invocation invokeWithTarget:nil];
 }
 
 @end
