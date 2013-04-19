@@ -68,9 +68,9 @@
     __block afproxy_failure_callback_t failure_callback_copy = [failure_callback copy];
     
     [_client invokeMethod:jsonMethod withParameters:arguments success:^(AFHTTPRequestOperation *operation, id responseObject) {
-        success_callback_copy(responseObject);
+        if(success_callback_copy!=NULL) success_callback_copy(responseObject);
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-        failure_callback_copy(error);
+        if(failure_callback_copy!=NULL) failure_callback_copy(error);
     }];
     [invocation invokeWithTarget:nil];
 }
