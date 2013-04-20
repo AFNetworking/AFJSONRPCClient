@@ -23,6 +23,10 @@
 
 #import "AFHTTPClient.h"
 
+
+typedef void (^afproxy_success_callback_t)(id responseObject);
+typedef void (^afproxy_failure_callback_t)(NSError *error);
+
 /**
  
  */
@@ -74,7 +78,7 @@
                                 parameters:(id)parameters
                                  requestId:(id)requestId;
 
-
+- (id) proxyWithProtocol:(Protocol*) protocol;
 @end
 
 ///----------------
