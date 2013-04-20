@@ -15,20 +15,15 @@
 
 @implementation AFJSONRPCProxy
 
-- (id)initWithEndpointURL:(NSURL *)URL protocol:(Protocol*) protocol
+- (id)initWithClient:(AFJSONRPCClient*) client protocol:(Protocol*) protocol
 {
     //self = [super init];
     if (self)
     {
-        _client = [AFJSONRPCClient clientWithEndpointURL:URL];
+        _client = client;
         implementedProtocol = protocol;
     }
     return self;
-}
-
-+ (id) proxyWithEndpointURL:(NSURL *)URL protocol:(Protocol*) protocol
-{
-    return [[self alloc] initWithEndpointURL:URL protocol:protocol];
 }
 
 - (BOOL)respondsToSelector:(SEL)aSelector

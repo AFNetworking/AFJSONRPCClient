@@ -23,6 +23,7 @@
 
 #import "AFJSONRPCClient.h"
 #import "AFJSONRequestOperation.h"
+#import "AFJSONRPCProxy.h"
 
 NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
 
@@ -155,5 +156,11 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
         }
     }];
 }
+
+- (id) proxyWithProtocol:(Protocol*) protocol
+{
+    return [[AFJSONRPCProxy alloc] initWithClient:self protocol:protocol];
+}
+
 
 @end

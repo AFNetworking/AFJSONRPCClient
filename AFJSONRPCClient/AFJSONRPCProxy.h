@@ -12,8 +12,7 @@ typedef void (^afproxy_failure_callback_t)(NSError *error);
 
 @interface AFJSONRPCProxy : NSProxy
 
-+ (id)proxyWithEndpointURL:(NSURL *)URL protocol:(Protocol*) protocol;
-- (id)initWithEndpointURL:(NSURL *)URL protocol:(Protocol*) protocol;
+- (id)initWithClient:(AFJSONRPCClient *)client protocol:(Protocol*) protocol;
 
 @property AFJSONRPCClient *client;
 

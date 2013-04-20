@@ -74,7 +74,7 @@
                                 parameters:(id)parameters
                                  requestId:(id)requestId;
 
-
+- (id) proxyWithProtocol:(Protocol*) protocol;
 @end
 
 ///----------------
