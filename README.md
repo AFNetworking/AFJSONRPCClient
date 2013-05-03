@@ -20,6 +20,7 @@ AFJSONRPCClient *client = [AFJSONRPCClient clientWithEndpointURL:[NSURL URLWithS
 
 // Invocation with Parameters
 [client invokeWithMethod:@"method.name"
+>>>>>>> 795eff039dbde4048fcfe195f9b1697a3498b477
               parameters:@{@"foo" : @"bar", @"baz" : @(13)}
     success:^(AFHTTPRequestOperation *operation, id responseObject) {
     // ...

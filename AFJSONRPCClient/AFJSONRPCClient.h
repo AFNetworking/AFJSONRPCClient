@@ -81,7 +81,14 @@
 /**
  
  */
+<<<<<<< HEAD
 - (id)proxyWithProtocol:(Protocol *)protocol;
+=======
+- (NSMutableURLRequest *)requestWithMethod:(NSString *)method
+                                parameters:(id)parameters
+                                 requestId:(id)requestId;
+
+>>>>>>> 795eff039dbde4048fcfe195f9b1697a3498b477
 
 @end
 
