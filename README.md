@@ -19,8 +19,8 @@ AFJSONRPCClient *client = [AFJSONRPCClient clientWithEndpointURL:[NSURL URLWithS
 }];
 
 // Invocation with Parameters
-[client invokeWithMethod:@"method.name"
-              parameters:@{@"foo" : @"bar", @"baz" : @(13)}
+[client invokeMethod:@"method.name"
+      withParameters:@{@"foo" : @"bar", @"baz" : @(13)}
     success:^(AFHTTPRequestOperation *operation, id responseObject) {
     // ...
 }   failure:^(AFHTTPRequestOperation *operation, NSError *error) {
@@ -28,9 +28,9 @@ AFJSONRPCClient *client = [AFJSONRPCClient clientWithEndpointURL:[NSURL URLWithS
 }];
 
 // Invocation with Parameters and Request ID
-[client invokeWithMethod:@"method.name"
-              parameters:@[@(YES), @(42)]
-               requestId:@(2)
+[client invokeMethod:@"method.name"
+      withParameters:@[@(YES), @(42)]
+           requestId:@(2)
     success:^(AFHTTPRequestOperation *operation, id responseObject) {
     // ...
 }   failure:^(AFHTTPRequestOperation *operation, NSError *error) {
