@@ -44,6 +44,12 @@
 - (id)initWithEndpointURL:(NSURL *)URL;
 
 /**
+  Add HTTP BAsic Authentication
+ */
+-(void)setBasicAuthWith:(NSString *)username
+            andPassword:(NSString *)password;
+
+/**
 
  */
 - (NSMutableURLRequest *)requestWithMethod:(NSString *)method

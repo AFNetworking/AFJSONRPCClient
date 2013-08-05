@@ -68,6 +68,13 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
     return self;
 }
 
+-(void)setBasicAuthWith:(NSString *)username
+            andPassword:(NSString *)password
+{
+    [self clearAuthorizationHeader];
+    [self setAuthorizationHeaderWithUsername:username password:password];
+}
+
 - (void)invokeMethod:(NSString *)method
              success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
              failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure

@@ -10,7 +10,7 @@
 AFJSONRPCClient *client = [AFJSONRPCClient clientWithEndpointURL:[NSURL URLWithString:@"http://path.to/json-rpc/service/"]];
 
 // Invocation
-[client invokeWithMethod:@"method.name"
+[client invokeMethod:@"method.name"
     success:^(AFHTTPRequestOperation *operation, id responseObject)
 {
     // ...
@@ -19,7 +19,7 @@ AFJSONRPCClient *client = [AFJSONRPCClient clientWithEndpointURL:[NSURL URLWithS
 }];
 
 // Invocation with Parameters
-[client invokeWithMethod:@"method.name"
+[client invokeMethod:@"method.name"
               parameters:@{@"foo" : @"bar", @"baz" : @(13)}
     success:^(AFHTTPRequestOperation *operation, id responseObject) {
     // ...
@@ -28,7 +28,7 @@ AFJSONRPCClient *client = [AFJSONRPCClient clientWithEndpointURL:[NSURL URLWithS
 }];
 
 // Invocation with Parameters and Request ID
-[client invokeWithMethod:@"method.name"
+[client invokeMethod:@"method.name"
               parameters:@[@(YES), @(42)]
                requestId:@(2)
     success:^(AFHTTPRequestOperation *operation, id responseObject) {
@@ -36,6 +36,19 @@ AFJSONRPCClient *client = [AFJSONRPCClient clientWithEndpointURL:[NSURL URLWithS
 }   failure:^(AFHTTPRequestOperation *operation, NSError *error) {
     // ...
 }];
+
+// Invocation with Parameters Dictionary and Basic HTTP Authentication
+
+[client setBasicAuthWith:@"HTTP-Basic-Username" andPassword:@"HTTP-Basic-Password"];
+
+[client invokeMethod:@"user.get"
+      withParameters:@{@"user": @{@"name":@"joey", @"password":@"hard-to-guess"}}
+           requestId:@(2)
+             success:^(AFHTTPRequestOperation *operation, id responseObject) {
+                 // ...
+             }   failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+                 // ...
+             }];
 ```
 
 ## Using Protocol & NSProxy
