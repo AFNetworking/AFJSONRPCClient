@@ -19,7 +19,7 @@ AFJSONRPCClient *client = [AFJSONRPCClient clientWithEndpointURL:[NSURL URLWithS
 }];
 
 // Invocation with Parameters
-[client invokehMethod:@"method.name"
+[client invokeMethod:@"method.name"
               parameters:@{@"foo" : @"bar", @"baz" : @(13)}
     success:^(AFHTTPRequestOperation *operation, id responseObject) {
     // ...
@@ -39,17 +39,10 @@ AFJSONRPCClient *client = [AFJSONRPCClient clientWithEndpointURL:[NSURL URLWithS
 
 // Invocation with Parameters Dictionary and Basic HTTP Authentication
 
-// {"user":{"name":"joey","password":"hard-to-guess"}}
-NSDictionary *params = [NSDictionary dictionaryWithObjectsAndKeys:
-                            [NSDictionary dictionaryWithObjectsAndKeys:
-                             @"joey", @"name",
-                             @"hard-to-guess", @"password",
-                             nil], @"user",
-                            nil];
 [client setBasicAuthWith:@"HTTP-Basic-Username" andPassword:@"HTTP-Basic-Password"];
 
 [client invokeMethod:@"user.get"
-      withParameters:params
+      withParameters:@{@"user": @{@"name":@"joey", @"password":@"hard-to-guess"}}
            requestId:@(2)
              success:^(AFHTTPRequestOperation *operation, id responseObject) {
                  // ...
