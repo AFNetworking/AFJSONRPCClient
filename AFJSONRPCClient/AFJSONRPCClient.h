@@ -21,12 +21,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#import "AFHTTPClient.h"
+@class AFHTTPRequestOperation;
 
 /**
 
  */
-@interface AFJSONRPCClient : AFHTTPClient
+@interface AFJSONRPCClient : NSObject
 
 /**
 
