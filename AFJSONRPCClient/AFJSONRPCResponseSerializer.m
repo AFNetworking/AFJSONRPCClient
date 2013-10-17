@@ -13,7 +13,7 @@
 - (instancetype)init {
     if (self = [super init]) {
         NSMutableSet * mutableContentTypes = [NSMutableSet setWithSet:self.acceptableContentTypes];
-        [mutableContentTypes addObject:@"application/json-rpc"];
+        [mutableContentTypes addObjectsFromArray:@[@"application/json-rpc", @"application/jsonrequest"]];
         self.acceptableContentTypes = [NSSet setWithSet:mutableContentTypes];
     }
     return self;
