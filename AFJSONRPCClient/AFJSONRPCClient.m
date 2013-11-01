@@ -128,6 +128,8 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
     return [super HTTPRequestOperationWithRequest:urlRequest success:^(AFHTTPRequestOperation *operation, id responseObject) {
         NSInteger errorCode = 0;
         NSString *errorMessage = nil;
+        id unknownError = nil;
+        id errorData = nil;
 
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             id result = [responseObject objectForKey:@"result"];
@@ -141,8 +143,13 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
                 if ([error isKindOfClass:[NSDictionary class]] && [error objectForKey:@"code"] && [error objectForKey:@"message"]) {
                     errorCode = [[error objectForKey:@"code"] intValue];
                     errorMessage = [error objectForKey:@"message"];
+                    // according to JSON-RPC 2.0 spec http://www.jsonrpc.org/specification
+                    if ([error objectForKey:@"data"]) {
+                        errorData = [error objectForKey:@"data"];
+                    }
                 } else {
                     errorMessage = NSLocalizedStringFromTable(@"Unknown Error", @"AFJSONRPCClient", nil);
+                    unknownError = error;
                 }
             } else {
                 errorMessage = NSLocalizedStringFromTable(@"Unknown JSON-RPC Response", @"AFJSONRPCClient", nil);
@@ -154,6 +161,12 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
         if (errorMessage && failure) {
             NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
             [userInfo setValue:errorMessage forKey:NSLocalizedDescriptionKey];
+            if (unknownError != nil) {
+                [userInfo setValue:unknownError forKey:@"UnknownError"];
+            }
+            if (errorData != nil) {
+                [userInfo setValue:errorData forKey:@"Data"];
+            }
             NSError *error = [NSError errorWithDomain:AFJSONRPCErrorDomain code:errorCode userInfo:userInfo];
 
             failure(operation, error);
