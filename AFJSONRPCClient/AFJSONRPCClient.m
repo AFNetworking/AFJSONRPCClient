@@ -22,7 +22,6 @@
 // THE SOFTWARE.
 
 #import "AFJSONRPCClient.h"
-#import "AFJSONRequestOperation.h"
 
 #import <objc/runtime.h>
 
@@ -42,9 +41,6 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
 @implementation AFJSONRPCClient
 @synthesize endpointURL = _endpointURL;
 
-+ (void)initialize {
-    [AFJSONRequestOperation addAcceptableContentTypes:[NSSet setWithObjects:@"application/json-rpc", @"application/jsonrequest", nil]];
-}
 
 + (instancetype)clientWithEndpointURL:(NSURL *)URL {
     return [[self alloc] initWithEndpointURL:URL];
@@ -57,12 +53,8 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
     if (!self) {
         return nil;
     }
-
-    self.parameterEncoding = AFJSONParameterEncoding;
-
-    [self registerHTTPOperationClass:[AFJSONRequestOperation class]];
-    [self setDefaultHeader:@"Accept" value:@"application/json"];
-
+    self.responseSerializer = [AFJSONResponseSerializer serializer];
+    self.requestSerializer  = [AFJSONRequestSerializer serializer];
     self.endpointURL = URL;
 
     return self;
@@ -90,8 +82,51 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
              failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
 {
     NSMutableURLRequest *request = [self requestWithMethod:method parameters:parameters requestId:requestId];
-    AFHTTPRequestOperation *operation = [self HTTPRequestOperationWithRequest:request success:success failure:failure];
-    [self enqueueHTTPRequestOperation:operation];
+
+    AFHTTPRequestOperation *operation =  [[AFHTTPRequestOperation alloc] initWithRequest:request];
+    
+    [operation setResponseSerializer:[AFJSONResponseSerializer serializer]];
+    
+    [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
+        NSInteger errorCode = 0;
+        NSString *errorMessage = nil;
+        
+        if ([responseObject isKindOfClass:[NSDictionary class]]) {
+            id result = [responseObject objectForKey:@"result"];
+            id error = [responseObject objectForKey:@"error"];
+            
+            if (result && result != [NSNull null]) {
+                if (success) {
+                    success(operation, result);
+                }
+            } else if (error && error != [NSNull null]) {
+                if ([error isKindOfClass:[NSDictionary class]] && [error objectForKey:@"code"] && [error objectForKey:@"message"]) {
+                    errorCode = [[error objectForKey:@"code"] intValue];
+                    errorMessage = [error objectForKey:@"message"];
+                } else {
+                    errorMessage = NSLocalizedStringFromTable(@"Unknown Error", @"AFJSONRPCClient", nil);
+                }
+            } else {
+                errorMessage = NSLocalizedStringFromTable(@"Unknown JSON-RPC Response", @"AFJSONRPCClient", nil);
+            }
+        } else {
+            errorMessage = NSLocalizedStringFromTable(@"Unknown JSON-RPC Response", @"AFJSONRPCClient", nil);
+        }
+        
+        if (errorMessage && failure) {
+            NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
+            [userInfo setValue:errorMessage forKey:NSLocalizedDescriptionKey];
+            NSError *error = [NSError errorWithDomain:AFJSONRPCErrorDomain code:errorCode userInfo:userInfo];
+            
+            failure(operation, error);
+        }
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        if (failure) {
+            failure(operation, error);
+        }
+    }];
+    
+    [self.operationQueue addOperation:operation];
 }
 
 - (NSMutableURLRequest *)requestWithMethod:(NSString *)method
@@ -116,7 +151,7 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
     [payload setValue:parameters forKey:@"params"];
     [payload setValue:[requestId description] forKey:@"id"];
 
-    return [self requestWithMethod:@"POST" path:[self.endpointURL absoluteString] parameters:payload];
+    return [self.requestSerializer requestWithMethod:@"POST" URLString:[self.endpointURL absoluteString] parameters:payload];
 }
 
 #pragma mark - AFHTTPClient
@@ -125,44 +160,8 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
                                                     success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
                                                     failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
 {
-    return [super HTTPRequestOperationWithRequest:urlRequest success:^(AFHTTPRequestOperation *operation, id responseObject) {
-        NSInteger errorCode = 0;
-        NSString *errorMessage = nil;
-
-        if ([responseObject isKindOfClass:[NSDictionary class]]) {
-            id result = [responseObject objectForKey:@"result"];
-            id error = [responseObject objectForKey:@"error"];
-
-            if (result && result != [NSNull null]) {
-                if (success) {
-                    success(operation, result);
-                }
-            } else if (error && error != [NSNull null]) {
-                if ([error isKindOfClass:[NSDictionary class]] && [error objectForKey:@"code"] && [error objectForKey:@"message"]) {
-                    errorCode = [[error objectForKey:@"code"] intValue];
-                    errorMessage = [error objectForKey:@"message"];
-                } else {
-                    errorMessage = NSLocalizedStringFromTable(@"Unknown Error", @"AFJSONRPCClient", nil);
-                }
-            } else {
-                errorMessage = NSLocalizedStringFromTable(@"Unknown JSON-RPC Response", @"AFJSONRPCClient", nil);
-            }
-        } else {
-            errorMessage = NSLocalizedStringFromTable(@"Unknown JSON-RPC Response", @"AFJSONRPCClient", nil);
-        }
-
-        if (errorMessage && failure) {
-            NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
-            [userInfo setValue:errorMessage forKey:NSLocalizedDescriptionKey];
-            NSError *error = [NSError errorWithDomain:AFJSONRPCErrorDomain code:errorCode userInfo:userInfo];
-
-            failure(operation, error);
-        }
-    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-        if (failure) {
-            failure(operation, error);
-        }
-    }];
+    [NSException raise:@"DO NOT CALL" format:@""];
+    return nil;
 }
 
 - (id)proxyWithProtocol:(Protocol *)protocol {
