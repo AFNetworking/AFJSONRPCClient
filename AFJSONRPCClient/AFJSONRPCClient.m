@@ -76,7 +76,7 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
              success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
              failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
 {
-    [self invokeMethod:method withParameters:parameters requestId:[NSNumber numberWithInteger:1] success:success failure:failure];
+    [self invokeMethod:method withParameters:parameters requestId:@(1) success:success failure:failure];
 }
 
 - (void)invokeMethod:(NSString *)method
@@ -103,7 +103,7 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
     NSAssert([parameters isKindOfClass:[NSDictionary class]] || [parameters isKindOfClass:[NSArray class]], @"Expect NSArray or NSDictionary in JSONRPC parameters");
 
     if (!requestId) {
-        requestId = [NSNumber numberWithInteger:1];
+        requestId = @(1);
     }
 
     NSMutableDictionary *payload = [NSMutableDictionary dictionary];
