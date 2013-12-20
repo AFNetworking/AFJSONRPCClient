@@ -21,14 +21,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#import "AFHTTPClient.h"
+#import "AFHTTPRequestOperationManager.h"
 
 /**
  AFJSONRPCClient objects communicate with web services using the JSON-RPC 2.0 protocol.
  
  @see http://www.jsonrpc.org/specification
  */
-@interface AFJSONRPCClient : AFHTTPClient
+@interface AFJSONRPCClient : AFHTTPRequestOperationManager
 
 /**
  The endpoint URL for the webservice.
