@@ -205,7 +205,7 @@ typedef void (^AFJSONRPCProxyFailureBlock)(NSError *error);
 - (void)forwardInvocation:(NSInvocation *)invocation {
     NSParameterAssert(invocation.methodSignature.numberOfArguments == 5);
 
-    NSString *RPCMethod = [[NSStringFromSelector([invocation selector]) componentsSeparatedByString:@":"] objectAtIndex:0];
+    NSString *RPCMethod = [NSStringFromSelector([invocation selector]) componentsSeparatedByString:@":"][0];
 
     __unsafe_unretained id arguments;
     __unsafe_unretained AFJSONRPCProxySuccessBlock unsafeSuccess;
