@@ -40,7 +40,6 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
 @end
 
 @implementation AFJSONRPCClient
-@synthesize endpointURL = _endpointURL;
 
 + (instancetype)clientWithEndpointURL:(NSURL *)URL {
     return [[self alloc] initWithEndpointURL:URL];
@@ -177,8 +176,6 @@ typedef void (^AFJSONRPCProxyFailureBlock)(NSError *error);
 @end
 
 @implementation AFJSONRPCProxy
-@synthesize client = _client;
-@synthesize protocol = _protocol;
 
 - (id)initWithClient:(AFJSONRPCClient*)client
             protocol:(Protocol *)protocol
