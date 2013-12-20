@@ -22,7 +22,7 @@
 // THE SOFTWARE.
 
 #import "AFJSONRPCClient.h"
-#import "AFJSONRequestOperation.h"
+#import "AFHTTPRequestOperation.h"
 
 #import <objc/runtime.h>
 
@@ -42,10 +42,6 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
 @implementation AFJSONRPCClient
 @synthesize endpointURL = _endpointURL;
 
-+ (void)initialize {
-    [AFJSONRequestOperation addAcceptableContentTypes:[NSSet setWithObjects:@"application/json-rpc", @"application/jsonrequest", nil]];
-}
-
 + (instancetype)clientWithEndpointURL:(NSURL *)URL {
     return [[self alloc] initWithEndpointURL:URL];
 }
@@ -58,10 +54,10 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
         return nil;
     }
 
-    self.parameterEncoding = AFJSONParameterEncoding;
+    self.requestSerializer = [AFJSONRequestSerializer serializer];
+    [self.requestSerializer setValue:@"application/json" forHTTPHeaderField:@"Accept"];
 
-    [self registerHTTPOperationClass:[AFJSONRequestOperation class]];
-    [self setDefaultHeader:@"Accept" value:@"application/json"];
+    self.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@"application/json-rpc", @"application/jsonrequest", nil];
 
     self.endpointURL = URL;
 
@@ -91,7 +87,7 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
 {
     NSMutableURLRequest *request = [self requestWithMethod:method parameters:parameters requestId:requestId];
     AFHTTPRequestOperation *operation = [self HTTPRequestOperationWithRequest:request success:success failure:failure];
-    [self enqueueHTTPRequestOperation:operation];
+    [self.operationQueue addOperation:operation];
 }
 
 - (NSMutableURLRequest *)requestWithMethod:(NSString *)method
@@ -116,7 +112,7 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
     [payload setValue:parameters forKey:@"params"];
     [payload setValue:[requestId description] forKey:@"id"];
 
-    return [self requestWithMethod:@"POST" path:[self.endpointURL absoluteString] parameters:payload];
+    return [self.requestSerializer requestWithMethod:@"POST" URLString:[self.endpointURL absoluteString] parameters:payload];
 }
 
 #pragma mark - AFHTTPClient
