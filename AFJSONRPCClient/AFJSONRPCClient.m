@@ -126,17 +126,17 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
         NSString *errorMessage = nil;
 
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
-            id result = [responseObject objectForKey:@"result"];
-            id error = [responseObject objectForKey:@"error"];
+            id result = responseObject[@"result"];
+            id error = responseObject[@"error"];
 
             if (result && result != [NSNull null]) {
                 if (success) {
                     success(operation, result);
                 }
             } else if (error && error != [NSNull null]) {
-                if ([error isKindOfClass:[NSDictionary class]] && [error objectForKey:@"code"] && [error objectForKey:@"message"]) {
-                    errorCode = [[error objectForKey:@"code"] intValue];
-                    errorMessage = [error objectForKey:@"message"];
+                if ([error isKindOfClass:[NSDictionary class]] && error[@"code"] && error[@"message"]) {
+                    errorCode = [error[@"code"] integerValue];
+                    errorMessage = error[@"message"];
                 } else {
                     errorMessage = NSLocalizedStringFromTable(@"Unknown Error", @"AFJSONRPCClient", nil);
                 }
