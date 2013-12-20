@@ -122,8 +122,8 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
                                                     failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
 {
     return [super HTTPRequestOperationWithRequest:urlRequest success:^(AFHTTPRequestOperation *operation, id responseObject) {
-        NSInteger errorCode = 0;
-        NSString *errorMessage = nil;
+        NSInteger code = 0;
+        NSString *message = nil;
 
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             id result = responseObject[@"result"];
@@ -135,22 +135,22 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
                 }
             } else if (error && error != [NSNull null]) {
                 if ([error isKindOfClass:[NSDictionary class]] && error[@"code"] && error[@"message"]) {
-                    errorCode = [error[@"code"] integerValue];
-                    errorMessage = error[@"message"];
+                    code = [error[@"code"] integerValue];
+                    message = error[@"message"];
                 } else {
-                    errorMessage = NSLocalizedStringFromTable(@"Unknown Error", @"AFJSONRPCClient", nil);
+                    message = NSLocalizedStringFromTable(@"Unknown Error", @"AFJSONRPCClient", nil);
                 }
             } else {
-                errorMessage = NSLocalizedStringFromTable(@"Unknown JSON-RPC Response", @"AFJSONRPCClient", nil);
+                message = NSLocalizedStringFromTable(@"Unknown JSON-RPC Response", @"AFJSONRPCClient", nil);
             }
         } else {
-            errorMessage = NSLocalizedStringFromTable(@"Unknown JSON-RPC Response", @"AFJSONRPCClient", nil);
+            message = NSLocalizedStringFromTable(@"Unknown JSON-RPC Response", @"AFJSONRPCClient", nil);
         }
 
-        if (errorMessage && failure) {
+        if (message && failure) {
             NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
-            [userInfo setValue:errorMessage forKey:NSLocalizedDescriptionKey];
-            NSError *error = [NSError errorWithDomain:AFJSONRPCErrorDomain code:errorCode userInfo:userInfo];
+            [userInfo setValue:message forKey:NSLocalizedDescriptionKey];
+            NSError *error = [NSError errorWithDomain:AFJSONRPCErrorDomain code:code userInfo:userInfo];
 
             failure(operation, error);
         }
