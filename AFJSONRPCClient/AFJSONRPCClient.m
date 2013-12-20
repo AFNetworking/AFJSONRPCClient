@@ -68,7 +68,7 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
              success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
              failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
 {
-    [self invokeMethod:method withParameters:[NSArray array] success:success failure:failure];
+    [self invokeMethod:method withParameters:@[] success:success failure:failure];
 }
 
 - (void)invokeMethod:(NSString *)method
@@ -97,7 +97,7 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
     NSParameterAssert(method);
 
     if (!parameters) {
-        parameters = [NSArray array];
+        parameters = @[];
     }
 
     NSAssert([parameters isKindOfClass:[NSDictionary class]] || [parameters isKindOfClass:[NSArray class]], @"Expect NSArray or NSDictionary in JSONRPC parameters");
@@ -106,11 +106,11 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
         requestId = [NSNumber numberWithInteger:1];
     }
 
-    NSDictionary *payload = [NSMutableDictionary dictionary];
-    [payload setValue:@"2.0" forKey:@"jsonrpc"];
-    [payload setValue:method forKey:@"method"];
-    [payload setValue:parameters forKey:@"params"];
-    [payload setValue:[requestId description] forKey:@"id"];
+    NSMutableDictionary *payload = [NSMutableDictionary dictionary];
+    payload[@"jsonrpc"] = @"2.0";
+    payload[@"method"] = method;
+    payload[@"params"] = parameters;
+    payload[@"id"] = [requestId description];
 
     return [self.requestSerializer requestWithMethod:@"POST" URLString:[self.endpointURL absoluteString] parameters:payload];
 }
@@ -148,8 +148,7 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
         }
 
         if (message && failure) {
-            NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
-            [userInfo setValue:message forKey:NSLocalizedDescriptionKey];
+            NSDictionary *userInfo = @{NSLocalizedDescriptionKey: message};
             NSError *error = [NSError errorWithDomain:AFJSONRPCErrorDomain code:code userInfo:userInfo];
 
             failure(operation, error);
