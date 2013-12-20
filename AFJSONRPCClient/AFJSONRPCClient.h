@@ -24,41 +24,66 @@
 #import "AFHTTPClient.h"
 
 /**
-
+ AFJSONRPCClient objects communicate with web services using the JSON-RPC 2.0 protocol.
+ 
+ @see http://www.jsonrpc.org/specification
  */
 @interface AFJSONRPCClient : AFHTTPClient
 
 /**
-
+ The endpoint URL for the webservice.
  */
 @property (readonly, nonatomic, strong) NSURL *endpointURL;
 
 /**
-
+ Creates and initializes a JSON-RPC client with the specified endpoint.
+ 
+ @param URL The endpoint URL.
+ 
+ @return An initialized JSON-RPC client.
  */
 + (instancetype)clientWithEndpointURL:(NSURL *)URL;
 
 /**
-
+ Initializes a JSON-RPC client with the specified endpoint.
+ 
+ @param URL The endpoint URL.
+ 
+ @return An initialized JSON-RPC client.
  */
 - (id)initWithEndpointURL:(NSURL *)URL;
 
 /**
-
+ Creates a request with the specified HTTP method, parameters, and request ID.
+ 
+ @param method The HTTP method. Must not be `nil`.
+ @param parameters The parameters to encode into the request. Must be either an `NSDictionary` or `NSArray`.
+ @param requestID The ID of the request.
+ 
+ @return A JSON-RPC-encoded request.
  */
 - (NSMutableURLRequest *)requestWithMethod:(NSString *)method
                                 parameters:(id)parameters
                                  requestId:(id)requestId;
 
 /**
-
+ Creates a request with the specified method, and enqueues a request operation for it.
+ 
+ @param method The HTTP method. Must not be `nil`.
+ @param success A block object to be executed when the request operation finishes successfully. This block has no return value and takes two arguments: the request operation, and the response object created by the client response serializer.
+ @param failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes a two arguments: the request operation and the error describing the network or parsing error that occurred.
  */
 - (void)invokeMethod:(NSString *)method
              success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
              failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
 
 /**
+ Creates a request with the specified method and parameters, and enqueues a request operation for it.
 
+ @param method The HTTP method. Must not be `nil`.
+ @param parameters The parameters to encode into the request. Must be either an `NSDictionary` or `NSArray`.
+ @param success A block object to be executed when the request operation finishes successfully. This block has no return value and takes two arguments: the request operation, and the response object created by the client response serializer.
+ @param failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes a two arguments: the request operation and the error describing the network or parsing error that occurred.
  */
 - (void)invokeMethod:(NSString *)method
       withParameters:(id)parameters
@@ -66,7 +91,13 @@
              failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
 
 /**
+ Creates a request with the specified method and parameters, and enqueues a request operation for it.
 
+ @param method The HTTP method. Must not be `nil`.
+ @param parameters The parameters to encode into the request. Must be either an `NSDictionary` or `NSArray`.
+ @param requestID The ID of the request.
+ @param success A block object to be executed when the request operation finishes successfully. This block has no return value and takes two arguments: the request operation, and the response object created by the client response serializer.
+ @param failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes a two arguments: the request operation and the error describing the network or parsing error that occurred.
  */
 - (void)invokeMethod:(NSString *)method
       withParameters:(id)parameters
@@ -79,7 +110,11 @@
 ///----------------------
 
 /**
+ Returns a JSON-RPC client proxy object with methods conforming to the specified protocol.
 
+ @param The protocol.
+
+ @discussion This approach allows Objective-C messages to be transparently forwarded as JSON-RPC calls.
  */
 - (id)proxyWithProtocol:(Protocol *)protocol;
 
@@ -90,6 +125,6 @@
 ///----------------
 
 /**
-
+ AFJSONRPCClient errors.
  */
 extern NSString * const AFJSONRPCErrorDomain;
