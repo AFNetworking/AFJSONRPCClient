@@ -196,7 +196,7 @@ typedef void (^AFJSONRPCProxyFailureBlock)(NSError *error);
     return description.name != NULL;
 }
 
-- (NSMethodSignature *)methodSignatureForSelector:(SEL)selector {
+- (NSMethodSignature *)methodSignatureForSelector:(__unused SEL)selector {
     // 0: v->RET || 1: @->self || 2: :->SEL || 3: @->arg#0 (NSArray) || 4,5: ^v->arg#1,2 (block)
     NSMethodSignature *signature = [NSMethodSignature signatureWithObjCTypes:"v@:@^v^v"];
 
@@ -221,11 +221,11 @@ typedef void (^AFJSONRPCProxyFailureBlock)(NSError *error);
     __strong AFJSONRPCProxySuccessBlock strongSuccess = [unsafeSuccess copy];
     __strong AFJSONRPCProxyFailureBlock strongFailure = [unsafeFailure copy];
 
-    [self.client invokeMethod:RPCMethod withParameters:arguments success:^(AFHTTPRequestOperation *operation, id responseObject) {
+    [self.client invokeMethod:RPCMethod withParameters:arguments success:^(__unused AFHTTPRequestOperation *operation, id responseObject) {
         if (strongSuccess) {
             strongSuccess(responseObject);
         }
-    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+    } failure:^(__unused AFHTTPRequestOperation *operation, NSError *error) {
         if (strongFailure) {
             strongFailure(error);
         }
