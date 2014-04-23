@@ -111,7 +111,7 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
     payload[@"params"] = parameters;
     payload[@"id"] = [requestId description];
 
-    return [self.requestSerializer requestWithMethod:@"POST" URLString:[self.endpointURL absoluteString] parameters:payload];
+    return [self.requestSerializer requestWithMethod:@"POST" URLString:[self.endpointURL absoluteString] parameters:payload error:nil];
 }
 
 #pragma mark - AFHTTPClient
