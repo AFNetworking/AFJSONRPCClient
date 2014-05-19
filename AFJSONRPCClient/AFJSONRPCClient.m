@@ -56,7 +56,7 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
     self.requestSerializer = [AFJSONRequestSerializer serializer];
     [self.requestSerializer setValue:@"application/json" forHTTPHeaderField:@"Accept"];
 
-    self.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@"application/json-rpc", @"application/jsonrequest", nil];
+    self.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@"application/json", @"application/json-rpc", @"application/jsonrequest", nil];
 
     self.endpointURL = URL;
 
