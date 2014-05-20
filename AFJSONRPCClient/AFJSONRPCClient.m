@@ -111,7 +111,14 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
     payload[@"params"] = parameters;
     payload[@"id"] = [requestId description];
 
-    return [self.requestSerializer requestWithMethod:@"POST" URLString:[self.endpointURL absoluteString] parameters:payload];
+    if ([self.requestSerializer respondsToSelector:@selector(requestWithMethod:URLString:parameters:error:)]) {
+        return [self.requestSerializer requestWithMethod:@"POST" URLString:[self.endpointURL absoluteString] parameters:payload error:nil];
+    } else {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        return [self.requestSerializer requestWithMethod:@"POST" URLString:[self.endpointURL absoluteString] parameters:payload];
+#pragma clang diagnostic pop
+    }
 }
 
 #pragma mark - AFHTTPClient
