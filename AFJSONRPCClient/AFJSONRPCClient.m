@@ -140,6 +140,7 @@ static NSString * AFJSONRPCLocalizedErrorMessageForCode(NSInteger code) {
     return [super HTTPRequestOperationWithRequest:urlRequest success:^(AFHTTPRequestOperation *operation, id responseObject) {
         NSInteger code = 0;
         NSString *message = nil;
+        id data = nil;
 
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             id result = responseObject[@"result"];
@@ -160,6 +161,8 @@ static NSString * AFJSONRPCLocalizedErrorMessageForCode(NSInteger code) {
                     } else if (code) {
                         message = AFJSONRPCLocalizedErrorMessageForCode(code);
                     }
+
+                    data = error[@"data"];
                 } else {
                     message = NSLocalizedStringFromTable(@"Unknown Error", @"AFJSONRPCClient", nil);
                 }
@@ -170,8 +173,16 @@ static NSString * AFJSONRPCLocalizedErrorMessageForCode(NSInteger code) {
             message = NSLocalizedStringFromTable(@"Unknown JSON-RPC Response", @"AFJSONRPCClient", nil);
         }
 
-        if (message && failure) {
-            NSDictionary *userInfo = @{NSLocalizedDescriptionKey: message};
+        if (failure) {
+            NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
+            if (message) {
+                userInfo[NSLocalizedDescriptionKey] = message;
+            }
+
+            if (data) {
+                userInfo[@"data"] = data;
+            }
+
             NSError *error = [NSError errorWithDomain:AFJSONRPCErrorDomain code:code userInfo:userInfo];
 
             failure(operation, error);
