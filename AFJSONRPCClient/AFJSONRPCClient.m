@@ -28,6 +28,23 @@
 
 NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
 
+static NSString * AFJSONRPCLocalizedErrorMessageForCode(NSInteger code) {
+    switch(code) {
+        case -32700:
+            return @"Parse Error";
+        case -32600:
+            return @"Invalid Request";
+        case -32601:
+            return @"Method Not Found";
+        case -32602:
+            return @"Invalid Params";
+        case -32603:
+            return @"Internal Error";
+        default:
+            return @"Server Error";
+    }
+}
+
 @interface AFJSONRPCProxy : NSProxy
 - (id)initWithClient:(AFJSONRPCClient *)client
             protocol:(Protocol *)protocol;
@@ -133,9 +150,16 @@ NSString * const AFJSONRPCErrorDomain = @"com.alamofire.networking.json-rpc";
                     success(operation, result);
                 }
             } else if (error && error != [NSNull null]) {
-                if ([error isKindOfClass:[NSDictionary class]] && error[@"code"] && error[@"message"]) {
-                    code = [error[@"code"] integerValue];
-                    message = error[@"message"];
+                if ([error isKindOfClass:[NSDictionary class]]) {
+                    if (error[@"code"]) {
+                        code = [error[@"code"] integerValue];
+                    }
+
+                    if (error[@"message"]) {
+                        message = error[@"message"];
+                    } else if (code) {
+                        message = AFJSONRPCLocalizedErrorMessageForCode(code);
+                    }
                 } else {
                     message = NSLocalizedStringFromTable(@"Unknown Error", @"AFJSONRPCClient", nil);
                 }
