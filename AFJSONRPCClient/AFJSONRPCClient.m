@@ -149,6 +149,7 @@ static NSString * AFJSONRPCLocalizedErrorMessageForCode(NSInteger code) {
             if (result && result != [NSNull null]) {
                 if (success) {
                     success(operation, result);
+                    return;
                 }
             } else if (error && error != [NSNull null]) {
                 if ([error isKindOfClass:[NSDictionary class]]) {
