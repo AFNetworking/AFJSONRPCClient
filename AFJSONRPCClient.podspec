@@ -6,7 +6,7 @@ Pod::Spec.new do |s|
   s.authors = { 'wiistriker' => 'wiistriker@gmail.com', 'Mattt Thompson' => 'm@mattt.me' }
   s.license = 'MIT'
   s.summary = 'A JSON-RPC client build on AFNetworking.'
-  s.source = { :git => 'https://github.com/AFNetworking/AFJSONRPCClient.git',
+  s.source = { :git => 'https://github.com/zarochintsev/AFJSONRPCClient.git',
                :tag => '2.1.2' }
   s.source_files = 'AFJSONRPCClient'
   s.requires_arc = true
